@@ -172,3 +172,11 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+log/
+result/
+data/interpro_2503/active_site/
+data/interpro_2503/binding_site/
+data/interpro_2503/conserved_site/
+data/interpro_2503/domain/
+data/interpro_2503/motif/
+data/check_empty.ipynb
