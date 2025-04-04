@@ -68,7 +68,7 @@ def extract_fragment_sequence(pdb_file_path, ipr_keyword, start_residue, end_res
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Extract fragment from PDB file')
-    parser.add_argument('--interpro_keyword_dir', type=str, default='data/interpro_2503/active_site', help='Path to the interpro keyword directory')
+    parser.add_argument('--interpro_keyword_dir', type=str, default=None, help='Path to the interpro keyword directory')
     parser.add_argument('--pdb_file_path', type=str, help='Path to the PDB file')
     parser.add_argument('--start_residue', type=int, help='Start residue number')
     parser.add_argument('--end_residue', type=int, help='End residue number')
@@ -134,7 +134,7 @@ if __name__ == "__main__":
                             print(f"Error extracting fragment for {interpro_id} {uid}: {e}")
                             continue
             if len(fragment_seqs) > 0:
-                fasta_file_path = os.path.join(output_fasta_dir, f"{interpro_id}.fasta")
+                fasta_file_path = os.path.join(output_fasta_dir, f"{interpro_id}_fragment_af2.fasta")
                 with open(fasta_file_path, 'w') as output_fasta_file:
                     for fragment_seq in fragment_seqs:
                         output_fasta_file.write(fragment_seq + '\n')

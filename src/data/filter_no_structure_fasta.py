@@ -11,16 +11,16 @@ def filter_no_structure_fasta(interpro_keyword_dir):
         fasta_dir = os.path.join(interpro_keyword_dir, interpro_id, 'fasta')
         pdb_files = os.listdir(pdb_dir)
         uids = [pdb_file.split('.')[0] for pdb_file in pdb_files]
-        if os.path.exists(os.path.join(fasta_dir, 'merged.fasta')):
+        if os.path.exists(os.path.join(fasta_dir, f'{interpro_id}_all.fasta')):
             # 读取merged.fasta文件，如果里面的uniprot id在uids中，则保留，否则删除，保存为merged_filtered.fasta
-            with open(os.path.join(fasta_dir, 'merged.fasta'), 'r') as f:
+            with open(os.path.join(fasta_dir, f'{interpro_id}_all.fasta'), 'r') as f:
                 lines = f.readlines()
                 for line in lines:
                     if line.startswith('>'):
                         uid = line.split('|')[1]
                         if uid not in uids:
                             lines.remove(line)
-            with open(os.path.join(fasta_dir, f'{interpro_id}_merged_filtered.fasta'), 'w') as f:
+            with open(os.path.join(fasta_dir, f'{interpro_id}_full_af2.fasta'), 'w') as f:
                 for line in lines:
                     f.write(line)
         else:
