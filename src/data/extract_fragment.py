@@ -74,7 +74,7 @@ if __name__ == "__main__":
     parser.add_argument('--end_residue', type=int, help='End residue number')
     parser.add_argument('--output_pdb_dir', type=str, default=None, help='Path to the output pdb directory')
     parser.add_argument('--output_fasta_dir', type=str, default=None, help='Path to the output fasta directory')
-    parser.add_argument('--add_noise_rate', type=float, default=0.0, help='Add noise to the fragment')
+    parser.add_argument('--noise_rate', type=float, default=0.0, help='Add noise to the fragment')
     args = parser.parse_args()
     
     if args.interpro_keyword_dir:
@@ -85,7 +85,10 @@ if __name__ == "__main__":
 
             fragment_seqs = []
             if args.output_pdb_dir is None:
-                output_pdb_dir = os.path.join(args.interpro_keyword_dir, interpro_id, 'alphafold2_pdb_fragment')
+                if args.noise_rate > 0:
+                    output_pdb_dir = os.path.join(args.interpro_keyword_dir, interpro_id, f'alphafold2_pdb_fragment_noise_{args.noise_rate}')
+                else:
+                    output_pdb_dir = os.path.join(args.interpro_keyword_dir, interpro_id, 'alphafold2_pdb_fragment')
             if args.output_fasta_dir is None:
                 output_fasta_dir = os.path.join(args.interpro_keyword_dir, interpro_id, 'fasta')
             else:
@@ -118,7 +121,7 @@ if __name__ == "__main__":
                         fragment_length = end - start
                         
                         # add noise to the fragment
-                        noise_length = int(fragment_length * args.add_noise_rate)
+                        noise_length = int(fragment_length * args.noise_rate)
                         if noise_length > 0:
                             # start and end will be left or right of the original start and end
                             start = max(0, start + np.random.randint(-noise_length, noise_length))
@@ -134,7 +137,10 @@ if __name__ == "__main__":
                             print(f"Error extracting fragment for {interpro_id} {uid}: {e}")
                             continue
             if len(fragment_seqs) > 0:
-                fasta_file_path = os.path.join(output_fasta_dir, f"{interpro_id}_fragment_af2.fasta")
+                if args.noise_rate > 0:
+                    fasta_file_path = os.path.join(output_fasta_dir, f"{interpro_id}_fragment_af2_noise_{args.noise_rate}.fasta")
+                else:
+                    fasta_file_path = os.path.join(output_fasta_dir, f"{interpro_id}_fragment_af2.fasta")
                 with open(fasta_file_path, 'w') as output_fasta_file:
                     for fragment_seq in fragment_seqs:
                         output_fasta_file.write(fragment_seq + '\n')

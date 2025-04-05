@@ -43,10 +43,24 @@ if __name__ == '__main__':
         process_bar = tqdm(interpro_ids)
         for interpro_id in process_bar:
             process_bar.set_description(f"Processing {interpro_id}")
-            fasta_path = os.path.join(args.interpro_keyword_dir, interpro_id, 'fasta', f'{interpro_id}_fragment_af2.fasta')
+            fasta_dir = os.path.join(args.interpro_keyword_dir, interpro_id, 'fasta')
+            fasta_files = os.listdir(fasta_dir)
+            noise_fasta_files = []
+            for f in fasta_files:
+                if 'noise' in f:
+                    noise_fasta_files.append(os.path.join(fasta_dir, f))
+                
+            fasta_path = os.path.join(fasta_dir, f'{interpro_id}_fragment_af2.fasta')
+            
             if not os.path.exists(fasta_path):
                 continue
-            output_fasta_path = os.path.join(args.interpro_keyword_dir, interpro_id, 'fasta', f'{interpro_id}_fragment_af2_unique.fasta')
+            output_fasta_path = os.path.join(fasta_dir, f'{interpro_id}_fragment_af2_unique.fasta')
             filter_repeat_fasta(fasta_path, output_fasta_path)
+            print(f"Filter repeat sequences in {fasta_path} and save to {output_fasta_path}")
             
+            for noise_fasta_file in noise_fasta_files:
+                output_noise_fasta_name = noise_fasta_file.split('/')[-1][:-6]
+                output_noise_fasta_path = os.path.join(fasta_dir, f'{output_noise_fasta_name}_unique.fasta')
+                filter_repeat_fasta(noise_fasta_file, output_noise_fasta_path)
+                print(f"Filter repeat sequences in {noise_fasta_file} and save to {output_noise_fasta_path}")
                             
