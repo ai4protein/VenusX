@@ -1,4 +1,4 @@
-interpro_keyword=conserved_site
+interpro_keyword=domain
 # step 1: filter no structure fasta
 python src/data/filter_no_structure_fasta.py \
     --interpro_keyword_dir data/interpro_2503/${interpro_keyword}
@@ -20,4 +20,8 @@ python src/data/filter_repeat_fasta.py \
 python src/data/label_site_fasta.py \
     --interpro_keyword_dir data/interpro_2503/${interpro_keyword}
 
-# step 5: split train/val/test
+# step 5: merge the label within a sequence
+python src/data/label_merge.py \
+    --interpro_keyword_dir data/interpro_2503/${interpro_keyword}
+
+# step 6: split train/val/test
