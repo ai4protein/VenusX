@@ -180,3 +180,4 @@ data/interpro_2503/conserved_site/
 data/interpro_2503/domain/
 data/interpro_2503/motif/
 data/check_empty.ipynb
+train_log/
