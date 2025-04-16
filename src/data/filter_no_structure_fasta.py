@@ -5,10 +5,10 @@ from tqdm import tqdm
 import argparse
 
 def filter_no_structure_fasta(interpro_keyword_dir):
-    interpro_ids = os.listdir(interpro_keyword_dir)
+    interpro_ids = os.listdir(os.path.join(interpro_keyword_dir, 'raw'))
     for interpro_id in tqdm(interpro_ids):
-        pdb_dir = os.path.join(interpro_keyword_dir, interpro_id, 'alphafold2_pdb')
-        fasta_dir = os.path.join(interpro_keyword_dir, interpro_id, 'fasta')
+        pdb_dir = os.path.join(interpro_keyword_dir, 'raw', interpro_id, 'alphafold2_pdb')
+        fasta_dir = os.path.join(interpro_keyword_dir, 'raw', interpro_id, 'fasta')
         pdb_files = os.listdir(pdb_dir)
         uids = [pdb_file.split('.')[0] for pdb_file in pdb_files]
         if os.path.exists(os.path.join(fasta_dir, f'{interpro_id}_all.fasta')):

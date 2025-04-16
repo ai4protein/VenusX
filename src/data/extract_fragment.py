@@ -78,7 +78,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     if args.interpro_keyword_dir:
-        interpro_ids = sorted(os.listdir(args.interpro_keyword_dir))
+        interpro_ids = sorted(os.listdir(os.path.join(args.interpro_keyword_dir, 'raw')))
         process_bar = tqdm(interpro_ids)
         for interpro_id in process_bar:
             process_bar.set_description(f"Processing {interpro_id}")
@@ -86,11 +86,11 @@ if __name__ == "__main__":
             fragment_seqs = []
             if args.output_pdb_dir is None:
                 if args.noise_rate > 0:
-                    output_pdb_dir = os.path.join(args.interpro_keyword_dir, interpro_id, f'alphafold2_pdb_fragment_noise_{args.noise_rate}')
+                    output_pdb_dir = os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, f'alphafold2_pdb_fragment_noise_{args.noise_rate}')
                 else:
-                    output_pdb_dir = os.path.join(args.interpro_keyword_dir, interpro_id, 'alphafold2_pdb_fragment')
+                    output_pdb_dir = os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'alphafold2_pdb_fragment')
             if args.output_fasta_dir is None:
-                output_fasta_dir = os.path.join(args.interpro_keyword_dir, interpro_id, 'fasta')
+                output_fasta_dir = os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'fasta')
             else:
                 output_pdb_dir = args.output_pdb_dir
                 output_fasta_dir = args.output_fasta_dir
@@ -98,10 +98,10 @@ if __name__ == "__main__":
             os.makedirs(output_fasta_dir, exist_ok=True)
             
             # get fragment from pdb file
-            detail_json = json.load(open(os.path.join(args.interpro_keyword_dir, interpro_id, 'detail.json')))
+            detail_json = json.load(open(os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'detail.json')))
             for item in detail_json:
                 uid = item["metadata"]["accession"]
-                pdb_file = f"{args.interpro_keyword_dir}/{interpro_id}/alphafold2_pdb/{uid}.pdb"
+                pdb_file = f"{args.interpro_keyword_dir}/raw/{interpro_id}/alphafold2_pdb/{uid}.pdb"
                 if not os.path.exists(pdb_file):
                     print(f"PDB file not found for {interpro_id} {uid}.pdb")
                     continue

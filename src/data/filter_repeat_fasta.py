@@ -38,12 +38,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     if args.interpro_keyword_dir:
-        interpro_ids = sorted(os.listdir(args.interpro_keyword_dir))
+        interpro_ids = sorted(os.listdir(os.path.join(args.interpro_keyword_dir, 'raw')))
         print(f"Processing {len(interpro_ids)} interpro keywords")
         process_bar = tqdm(interpro_ids)
         for interpro_id in process_bar:
             process_bar.set_description(f"Processing {interpro_id}")
-            fasta_dir = os.path.join(args.interpro_keyword_dir, interpro_id, 'fasta')
+            fasta_dir = os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'fasta')
             fasta_files = os.listdir(fasta_dir)
             noise_fasta_files = []
             for f in fasta_files:

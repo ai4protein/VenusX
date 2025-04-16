@@ -50,12 +50,11 @@ if __name__ == '__main__':
     parser.add_argument('--interpro_keyword_dir', type=str, required=True, help='Path to the interpro keyword directory')
     args = parser.parse_args()
     
-    interpro_ids = sorted(os.listdir(args.interpro_keyword_dir))
+    interpro_ids = sorted(os.listdir(os.path.join(args.interpro_keyword_dir, 'raw')))
     print(f"Processing {len(interpro_ids)} interpro keywords")
     
     for interpro_id in tqdm(interpro_ids):
-        csv_path = os.path.join(args.interpro_keyword_dir, interpro_id, 
-                              'token_cls_fragment_af2_unique.csv')
+        csv_path = os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'token_cls_fragment_af2_unique.csv')
         if not os.path.exists(csv_path):
             print(f"CSV file {csv_path} does not exist")
             continue
@@ -69,5 +68,5 @@ if __name__ == '__main__':
         if len(merged_df) != len(df):
             print(f"{interpro_id}: Merged {len(df)} rows to {len(merged_df)} rows")
         # save merged results
-        output_path = os.path.join(args.interpro_keyword_dir, interpro_id, 'token_cls_fragment_af2_unique_merged.csv')
+        output_path = os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'token_cls_fragment_af2_unique_merged.csv')
         merged_df.to_csv(output_path, index=False)

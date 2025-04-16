@@ -34,16 +34,16 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     if args.interpro_keyword_dir:
-        interpro_ids = sorted(os.listdir(args.interpro_keyword_dir))
+        interpro_ids = sorted(os.listdir(os.path.join(args.interpro_keyword_dir, 'raw')))
         print(f"Processing {len(interpro_ids)} interpro keywords")
         process_bar = tqdm(interpro_ids)
         for interpro_id in process_bar:
             process_bar.set_description(f"Processing {interpro_id}")
             
             label_all_dict = {'uid': [], 'interpro_id': [], 'seq_full': [], 'seq_fragment': [], 'start': [], 'end': [], 'label': []}
-            full_fasta_path = os.path.join(args.interpro_keyword_dir, interpro_id, 'fasta', f'{interpro_id}_all.fasta')
+            full_fasta_path = os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'fasta', f'{interpro_id}_all.fasta')
             full_fasta_dict = read_fasta(full_fasta_path)
-            fragment_fasta_path = os.path.join(args.interpro_keyword_dir, interpro_id, 'fasta', f'{interpro_id}_fragment_af2_unique.fasta')
+            fragment_fasta_path = os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'fasta', f'{interpro_id}_fragment_af2_unique.fasta')
             
             if not os.path.exists(fragment_fasta_path):
                 print(f"Fragment fasta file {fragment_fasta_path} does not exist")
@@ -74,6 +74,6 @@ if __name__ == '__main__':
                             for k, v in label_dict.items():
                                 label_all_dict[k].append(v)
             label_df = pd.DataFrame(label_all_dict)
-            label_df.to_csv(os.path.join(args.interpro_keyword_dir, interpro_id, 'token_cls_fragment_af2_unique.csv'), index=False)
+            label_df.to_csv(os.path.join(args.interpro_keyword_dir, 'raw', interpro_id, 'token_cls_fragment_af2_unique.csv'), index=False)
                         
     
