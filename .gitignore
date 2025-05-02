@@ -202,3 +202,9 @@ data/interpro_2503/**
 
 data/check_empty.ipynb
 train_log/
+data/token_cls_dataset
+
+data/BioLiP_202503/raw
+data/BioLiP_202503/cluster
+data/BioLiP_202503/*.ipynb
+data/BioLiP_202503/*.csv
