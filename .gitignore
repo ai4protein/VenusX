@@ -208,3 +208,8 @@ data/biolip_2503/raw
 data/biolip_2503/cluster
 data/biolip_2503/*.ipynb
 data/biolip_2503/*.csv
+
+data/sabdab_2503/raw
+data/sabdab_2503/cluster
+data/sabdab_2503/*.ipynb
+data/sabdab_2503/*.csv
