@@ -3,7 +3,7 @@ import os
 import argparse
 import pandas as pd
 from tqdm import tqdm
-
+from utils import load_pdb_infor_from_csv
 # conda install -c schrodinger tmalign
 
 def calculate_align_info(predicted_pdb_path, reference_pdb_path):
@@ -40,50 +40,81 @@ def calculate_align_info(predicted_pdb_path, reference_pdb_path):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--predicted_pdb", type=str, default="result/cas12a_wet_exp/cas12a-20475_0.6/cas12a-20475_0.6_7.pdb")
-    parser.add_argument("--predicted_pdb_dir", type=str, default=None)
-    parser.add_argument("--reference_pdb", type=str, default="result/cas12a/cas12a_43.pdb")
-    parser.add_argument("--out_path", type=str, default="align_info.csv")
-    args = parser.parse_args()
+    parser.add_argument('--seq_fragment', action='store_true', help='sequence fragment')
+    parser.add_argument('--input_type', choices=['motif', 'domain', 'active_site', 'binding_site', 'conserved_site'], 
+                        default='active_site', help='sequence type')
+    parser.add_argument('--seq_id', type=str, default=None, help='sequence identity')
+    parser.add_argument('--target_pdb_batch', type=int, default=None, help='target pdb batch')
+    parser.add_argument('--target_pdb_id', type=int, default=None, help='target pdb id')
+    parser.add_argument('--dataset_file', type=str, help='data file path',
+                        default='/home/tanyang/workspace/VenusScope/data/interpro_2503/active_site/active_site_token_cls_af2.csv')
+    parser.add_argument("--out_file", type=str, default="tm_align_active_site_fragment.csv")
+    args = parser.parse_args()   
     
-    if args.predicted_pdb_dir is not None:
-        align_infos = {
-            "predicted_pdb": [],
-            "reference_pdb": [],
-            "aligned_length": [],
-            "rmsd": [],
-            "seq_identity": [],
-            "tm_score": [],
-            "tm_score_1": [],
-            "tm_score_2": []
-        }
-        predicted_pdbs = os.listdir(args.predicted_pdb_dir)
-        predicted_pdbs = [x for x in predicted_pdbs if x.endswith(".pdb")]
-        for predicted_pdb in tqdm(predicted_pdbs):
-            predicted_pdb_path = os.path.join(args.predicted_pdb_dir, predicted_pdb)
-            align_info = calculate_align_info(predicted_pdb_path, args.reference_pdb)
-            align_infos["predicted_pdb"].append(predicted_pdb)
-            align_infos["reference_pdb"].append(args.reference_pdb.split("/")[-1])
+    out_dir = os.path.dirname(args.out_file)
+    os.makedirs(out_dir, exist_ok=True)
+    
+    base_dir = '/home/tanyang/workspace/VenusScope/data/interpro_2503/'
+    pdb_dir = base_dir + args.input_type + '/raw/'
+    if args.seq_fragment:
+        dataset_file = base_dir + args.input_type + f'/{args.input_type}_token_cls_fragment_af2'
+    else:
+        dataset_file = base_dir + args.input_type + f'/{args.input_type}_token_cls_full_af2'
+    if args.seq_id is not None:
+        dataset_file = dataset_file + f'_{args.seq_id}.csv'
+    else:
+        dataset_file = dataset_file + '.csv'
+    
+    pdbs = load_pdb_infor_from_csv(dataset_file, args.seq_fragment, pdb_dir)[0]
+    pdbs = sorted(pdbs)
+    print('>>> total pdb number: ', len(pdbs))
+    
+    if args.target_pdb_batch is not None and args.target_pdb_id is not None:
+        ref_pdbs = pdbs[args.target_pdb_batch * args.target_pdb_id: args.target_pdb_batch * (args.target_pdb_id + 1)]
+        pdbs = [pdb for pdb in pdbs if pdb not in ref_pdbs]
+    else:
+        ref_pdbs = pdbs
+    
+    align_infos = {
+        "predicted_pdb": [],
+        "reference_pdb": [],
+        "aligned_length": [],
+        "rmsd": [],
+        "seq_identity": [],
+        "tm_score": [],
+        "tm_score_1": [],
+        "tm_score_2": []
+    }
+
+    for i, ref_pdb in enumerate(tqdm(ref_pdbs, desc="Reference PDB")):
+        for j, pred_pdb in enumerate(tqdm(pdbs)):
+            if i == j:
+                continue
+
+            align_info = calculate_align_info(pred_pdb, ref_pdb)
+            
+            if args.seq_fragment:
+                pred_pdb_names = os.path.basename(pred_pdb)[:-4].split("_")
+                pred_pdb_name = pred_pdb_names[0] + "_" + pred_pdb_names[1] + '-'.join(pred_pdb_names[2:])
+                ref_pdb_names = os.path.basename(ref_pdb)[:-4].split("_")
+                ref_pdb_name = ref_pdb_names[0] + "_" + ref_pdb_names[1] + '-'.join(ref_pdb_names[2:])
+            else:
+                pred_ipr_id = pred_pdb.split("/")[-3]
+                pred_pdb_name = os.path.basename(pred_pdb)[:-4]
+                pred_pdb_name = pred_ipr_id + "_" + pred_pdb_name
+                ref_ipr_id = ref_pdb.split("/")[-3]
+                ref_pdb_name = os.path.basename(ref_pdb)[:-4]
+                ref_pdb_name = ref_ipr_id + "_" + ref_pdb_name
+                
+            align_infos["predicted_pdb"].append(pred_pdb_name)
+            align_infos["reference_pdb"].append(ref_pdb_name)
             align_infos["aligned_length"].append(align_info["aligned_length"])
             align_infos["rmsd"].append(align_info["rmsd"])
             align_infos["seq_identity"].append(align_info["seq_identity"])
             align_infos["tm_score"].append(align_info["tm_score"])
             align_infos["tm_score_1"].append(align_info["tm_score_1"])
             align_infos["tm_score_2"].append(align_info["tm_score_2"])
+
         align_infos = pd.DataFrame(align_infos)
-        align_infos.to_csv(args.out_path, index=False)
-    else:
-        align_info = calculate_align_info(args.predicted_pdb, args.reference_pdb)
-        align_infos = {
-            "predicted_pdb": args.predicted_pdb.split("/")[-1],
-            "reference_pdb": args.reference_pdb.split("/")[-1],
-            "aligned_length": align_info["aligned_length"],
-            "rmsd": align_info["rmsd"],
-            "seq_identity": align_info["seq_identity"],
-            "tm_score": align_info["tm_score"],
-            "tm_score_1": align_info["tm_score_1"],
-            "tm_score_2": align_info["tm_score_2"]
-        }
-        align_infos = pd.DataFrame(align_infos, index=[0])
-        align_infos.to_csv(args.out_path, index=False)
+        align_infos.to_csv(args.out_file, index=False)
     
