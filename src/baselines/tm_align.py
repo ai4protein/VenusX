@@ -51,6 +51,11 @@ if __name__ == '__main__':
     parser.add_argument("--out_file", type=str, default="tm_align_active_site_fragment.csv")
     args = parser.parse_args()   
     
+    # Check if output file exists
+    if os.path.exists(args.out_file):
+        print(f"Output file {args.out_file} already exists. Skipping processing.")
+        exit(0)
+    
     out_dir = os.path.dirname(args.out_file)
     os.makedirs(out_dir, exist_ok=True)
     
