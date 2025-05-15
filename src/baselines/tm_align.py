@@ -40,15 +40,13 @@ def calculate_align_info(predicted_pdb_path, reference_pdb_path):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--seq_fragment', action='store_true', help='sequence fragment')
-    parser.add_argument('--input_type', choices=['motif', 'domain', 'active_site', 'binding_site', 'conserved_site'], 
-                        default='active_site', help='sequence type')
-    parser.add_argument('--seq_id', type=str, default=None, help='sequence identity')
+    parser.add_argument('--seq_fragment', action='store_true')
+    parser.add_argument('--seq_type', choices=['motif', 'domain', 'active_site', 'binding_site', 'conserved_site'])
     parser.add_argument('--target_pdb_batch', type=int, default=None, help='target pdb batch')
     parser.add_argument('--target_pdb_id', type=int, default=None, help='target pdb id')
-    parser.add_argument('--dataset_file', type=str, help='data file path',
-                        default='/home/tanyang/workspace/VenusScope/data/interpro_2503/active_site/active_site_token_cls_af2.csv')
-    parser.add_argument("--out_file", type=str, default="tm_align_active_site_fragment.csv")
+    parser.add_argument('--pdb_file', type=str)
+    parser.add_argument('--dataset_file', type=str)
+    parser.add_argument("--out_file", type=str)
     args = parser.parse_args()   
     
     # Check if output file exists
@@ -59,18 +57,9 @@ if __name__ == '__main__':
     out_dir = os.path.dirname(args.out_file)
     os.makedirs(out_dir, exist_ok=True)
     
-    base_dir = '/home/tanyang/workspace/VenusScope/data/interpro_2503/'
-    pdb_dir = base_dir + args.input_type + '/raw/'
-    if args.seq_fragment:
-        dataset_file = base_dir + args.input_type + f'/{args.input_type}_token_cls_fragment_af2'
-    else:
-        dataset_file = base_dir + args.input_type + f'/{args.input_type}_token_cls_full_af2'
-    if args.seq_id is not None:
-        dataset_file = dataset_file + f'_{args.seq_id}.csv'
-    else:
-        dataset_file = dataset_file + '.csv'
+    pdb_file = args.pdb_file + args.seq_type + '/raw/'
     
-    pdbs = load_pdb_infor_from_csv(dataset_file, args.seq_fragment, pdb_dir)[0]
+    pdbs = load_pdb_infor_from_csv(args.dataset_file, args.seq_fragment, pdb_file)[0]
     pdbs = sorted(pdbs)
     print('>>> total pdb number: ', len(pdbs))
     

@@ -23,6 +23,8 @@ from models.protssn.models import PLM_model, GNN_model
 from models.protssn.dataset_utils import NormalizeProtein
 warnings.filterwarnings("ignore")
 
+from utils import load_pdb_infor_from_csv
+
 class ProtSSN:
     def __init__(self, 
                  num_residue_type: int = 20, micro_radius: int = 20, cutoff: int = 30, 
@@ -388,19 +390,21 @@ if __name__ == '__main__':
     
     # model config
     parser.add_argument("--gnn", type=str, default="egnn", help="gat, gcn or egnn")
-    parser.add_argument("--gnn_config", type=str, default="/home/tanyang/workspace/VenusScope/src/models/protssn/egnn.yaml", help="gnn config")
+    parser.add_argument("--gnn_config", type=str, default="VenusScope/src/models/protssn/egnn.yaml", help="gnn config")
     parser.add_argument("--gnn_hidden_dim", type=int, default=512, help="hidden size of gnn")
-    parser.add_argument("--gnn_model_path", type=str, default="/home/tanyang/workspace-done/2024/eLife/ProtSSN/model/protssn_k20_h512.pt", help="gnn model path")
+    parser.add_argument("--gnn_model_path", type=str, default="protssn_k20_h512.pt", help="gnn model path")
     parser.add_argument("--plm", type=str, default="facebook/esm2_t33_650M_UR50D", help="esm param number")
     parser.add_argument("--plm_hidden_size", type=int, default=1280, help="hidden size of plm")
     parser.add_argument("--c_alpha_max_neighbors", type=int, default=10, help="graph dataset K")
     
+    parser.add_argument('--seq_fragment', action='store_true', default=False)
+    parser.add_argument('--seq_type', choices=['motif', 'domain', 'active_site', 'binding_site', 'conserved_site'])
+
     # dataset config
-    parser.add_argument("--out_type", type=str, nargs='+', default="embed", help="logits, ppl, or embed")
-    parser.add_argument("--pdb_file", type=str, default=None, help="pdb file path")
-    parser.add_argument("--pdb_dir", type=str, 
-    default='/home/tanyang/R_R/GwR/test/', help="pdb file directory")
-    parser.add_argument("--out_file", type=str, default='test_prossn.pt', help="output file path")
+    parser.add_argument('--pdb_dir', type=str)
+    parse.add_argument('dataset_dir', type=str)
+    parser.add_argument("--out_type", type=str, nargs='+', default="embed")
+    parser.add_argument("--out_file", type=str)
     
     args = parser.parse_args()
     
@@ -422,35 +426,27 @@ if __name__ == '__main__':
     if type(args.out_type) == str:
         args.out_type = [args.out_type]
     
-    if args.pdb_file:
-        logits = protssn.compute_logits(args.pdb_file)
-        print(logits, logits.shape)
-        ppl = protssn.compute_perplexity(args.pdb_file)
-        print(ppl)
-        embeds = protssn.compute_embedding(args.pdb_file)
-        print(embeds.shape)
     
+    pdb_dir = args.pdb_dir + args.seq_type + '/raw/'
+    dataset_file = args.dataset_dir + args.seq_type
+    if args.seq_fragment:
+        dataset_file += f'/{args.seq_type}_token_cls_af2.csv'
+    else:
+        dataset_file += f'/{args.seq_type}_token_cls_af2.csv'
+    pdbs, pdb_names = load_pdb_infor_from_csv(dataset_file, args.seq_fragment, pdb_dir)
     
-    if args.pdb_dir:
-        pdb_files = sorted(os.listdir(args.pdb_dir))[9900:]
-        save_info = {"name": []}
-        if 'logits' in args.out_type:
-            save_info["logits"] = []
-        if 'embed' in args.out_type:
-            save_info["embed"] = []
-        if 'ppl' in args.out_type:
-            save_info["ppl"] = []
-            
-        for pdb_file in tqdm(pdb_files):
-            pdb_file = os.path.join(args.pdb_dir, pdb_file)
-            save_info["name"].append(pdb_file)
-            if 'logits' in args.out_type:
-                logits = protssn.compute_logits(pdb_file)
-                save_info["logits"].append(logits)
-            if 'embed' in args.out_type:
-                embed = protssn.compute_embedding(pdb_file, reduction='mean')
-                save_info["embed"].append(embed)
-            if 'ppl' in args.out_type:
-                ppl = protssn.compute_perplexity(pdb_file)
-                save_info["ppl"].append(ppl)
-        torch.save(save_info, args.out_file)
+    save_info = {}
+        
+    save_info = {}
+
+    with torch.no_grad():
+        for index, pdb in tqdm(enumerate(pdbs), total=len(pdbs)):
+            embed = protssn.compute_embedding(pdb, reduction='mean')
+            embed_cpu = embed.cpu().numpy()
+            save_info[pdb_names[index]] = embed_cpu
+
+            del embed
+            del embed_cpu
+            torch.cuda.empty_cache()
+
+    torch.save(save_info, args.out_file)

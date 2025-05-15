@@ -177,6 +177,7 @@ log/
 result/
 
 data/interpro_2503/**
+.cath_benchmark.ipynb
 
 !data/
 !data/interpro_2503/
@@ -203,7 +204,7 @@ data/interpro_2503/**
 data/check_empty.ipynb
 train_log/
 data/token_cls_dataset
-
+data/fragment_cls_dataset
 data/biolip_2503/raw
 data/biolip_2503/cluster
 data/biolip_2503/*.ipynb
@@ -213,3 +214,7 @@ data/sabdab_2503/raw
 data/sabdab_2503/cluster
 data/sabdab_2503/*.ipynb
 data/sabdab_2503/*.csv
+
+temp_blast_db*
+*.png
+pbs/

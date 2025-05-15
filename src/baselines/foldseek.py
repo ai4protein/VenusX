@@ -16,6 +16,10 @@ def run_foldseek_easysearch(query_dir, target_dir, out_prefix="aln", num_threads
         target_dir,
         out_prefix,
         tmp_dir,
+        "--exhaustive-search",
+        "--max-seqs", "100000",
+        "-e", "1000",
+        "--min-seq-id", "0.0",
         "--alignment-type", str(alignment_type),
         "--threads", str(num_threads)
     ]
@@ -64,6 +68,9 @@ def convert2pt(m8_file, output_dir):
                     similarity = -np.log(evalue)
                     similarity_matrix[i, j] = similarity
                     similarity_matrix[j, i] = similarity  # Make it symmetric
+    
+    # reduce the precision of the similarity matrix
+    similarity_matrix = torch.round(similarity_matrix, decimals=3)
     
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)

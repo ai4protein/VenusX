@@ -16,6 +16,10 @@ def run_blastp(fasta_file, db_name, out_file, num_threads):
         "blastp",
         "-query", fasta_file,
         "-db", db_name,
+        "-evalue", "1000000",
+        "-word_size", "2",
+        "-max_target_seqs", "100000000",
+        "-seg", "no",
         "-out", out_file,
         "-outfmt", outfmt_fields,
         "-num_threads", str(num_threads)
@@ -35,7 +39,12 @@ def convert2pt(aln_file, output_dir):
                     all_names.add(parts[1])
     
     all_names = sorted(list(all_names))
+    if 'fragment' in aln_file:
+        new_all_names = [name.split('|')[-1].replace('/', '_') for name in all_names]
+    else:
+        new_all_names = [name.split('|')[1]+'_'+name.split('|')[0] for name in all_names]
     name_to_idx = {name: idx for idx, name in enumerate(all_names)}
+    new_name_to_idx = {name: idx for idx, name in enumerate(new_all_names)}
     
     # Create similarity matrix
     n = len(all_names)
@@ -59,9 +68,12 @@ def convert2pt(aln_file, output_dir):
     # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
     
+    # reduce the precision of the similarity matrix
+    similarity_matrix = torch.round(similarity_matrix, decimals=3)
+    
     # Save the tensors
     base_name = os.path.splitext(os.path.basename(aln_file))[0]
-    torch.save({'name_to_idx': name_to_idx, 'matrix': similarity_matrix}, os.path.join(output_dir, f"{base_name}.pt"))
+    torch.save({'name_to_idx': new_name_to_idx, 'matrix': similarity_matrix}, os.path.join(output_dir, f"{base_name}.pt"))
     
     print(f"[✓] Processed {len(all_names)} unique sequences")
     print(f"[✓] Saved tensors to {output_dir}")
