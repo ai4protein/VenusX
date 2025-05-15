@@ -16,19 +16,21 @@ conda activate VenusX
 
 python src/train.py \
     --task fragment_cls \
-    --dataset_file https://huggingface.co/datasets/AI4Protein/VenusX_Frag_Act_MF50/tree/main/ \
+    --dataset_name AI4Protein/VenusX_Frag_Act_MF50 \
     --batch_size 8 \
     --num_workers 4 \
     --device cuda \
     --seed 3407 \
-    --epoch 100 \
+    --epoch 2 \
     --init_lr 0.001 \
     --gradient_accumulation_steps 16 \
     --early_stopping \
     --patience 10 \
     --encoder_type plm \
     --plm_type esm \
-    --plm_dir facebook/esm2_t33_650M_UR50D \
+    --model_name_or_path facebook/esm2_t33_650M_UR50D \
     --plm_freeze \
     --max_len 128 \
-    --num_labels 132
+    --num_labels 132 \
+    --csv_log_path result/active_site/ \
+    --model_weight_path ckpt/fragment_cls/active_site/

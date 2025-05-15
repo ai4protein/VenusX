@@ -2,7 +2,7 @@
 
 ## 🚀 Introduction
 
-**VenusX** is the first large-scale benchmark for fine-grained functional annotation and function-based protein pairing at the residue, fragment, and domain levels, enabling a more detailed understanding of protein functional mechanisms and evaluation of the biological knowledge captured by models. VenusX comprises three major task categories spanning six types of annotations, including residue-level binary classification, fragment-level multi-class classification, and unsupervised local structure pairing for identifying critical **active sites**, **binding sites**, **conserved sites**, **motifs**, **domains**, and **epitopes**. The benchmark includes over **878,000** samples curated from leading open-source databases such as InterPro, BioLiP, and SAbDab. We provide mixed-family and cross-family splits at three sequence identity thresholds (50%, 70%, and 90%).
+**VenusX** is a large-scale benchmark for fine-grained protein functional annotation and pairing at residue, fragment, and domain levels. It includes three task categories with six annotation types: residue-level binary classification, fragment-level multi-class classification, and unsupervised local structure pairing for **active sites**, **binding sites**, **conserved sites**, **motifs**, **domains**, and **epitopes**. The benchmark contains over **878,000** samples from InterPro, BioLiP, and SAbDab databases, with mixed-family and cross-family splits at 50%, 70%, and 90% sequence identity thresholds.
 <img src="img/framework.png" alt="Logo">
 
 ## 📑 Results
@@ -14,7 +14,7 @@ VenusX benchmarks fine-grained protein understanding across multiple subprotein 
 - fragment-level multi-class classification: classifying fragments by biological role, 
 - pairwise functional similarity scoring: matching functionally similar proteins or substructures without requiring explicit function labels.
 
-Benchmarking a wide range of protein models on VenusX reveals large performance gaps across tasks and settings. Strong global performance often fails to translate to fine-grained understanding, exposing a reliance on distributional cues rather than precise biological signals and highlighting the need for more robust, interpretable models.
+Benchmarking protein models on VenusX reveals performance gaps between global and fine-grained tasks, highlighting the need for more robust and interpretable models.
 ### Baselines
 **Table: Summary of baseline models (methods) by input modality**
 
@@ -52,8 +52,8 @@ Benchmarking a wide range of protein models on VenusX reveals large performance 
 
 Please make sure you have installed **[Anaconda3](https://www.anaconda.com/download)** or **[Miniconda3](https://docs.conda.io/projects/miniconda/en/latest/)**.
 
-Then
 ```bash
+git clone https://github.com/AI4Protein/VenusX.git
 cd VenusX
 ```
 You can create the required environment using the following two methods.
@@ -92,4 +92,10 @@ The dataset for the VenuX Benchmark can be viewed and downloaded at **[Huggingfa
 Folder `VenusX/script/example/embedding` contains scripts for obtaining protein or fragment embeddings using deep learning models and traditional methods. Note: Please set the path of the dataset in the script according to the actual situation.
 
 
+## 🙌 Citation
 
+If you find this work useful, please consider citing:
+
+```bibtex
+
+```

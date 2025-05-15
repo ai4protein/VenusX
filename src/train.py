@@ -199,7 +199,8 @@ class Trainer(nn.Module):
             self.print_metrics_res(metrics_res)
         
         self.save_log()
-
+        self.save_model()
+        
         gc.collect()
 
     def train_step(self, batch):
@@ -298,18 +299,15 @@ class Trainer(nn.Module):
         
         self.file_header = self.args.csv_log_path + self.args.task + '/' + self.args.encoder_type + '/'
         
-        parts = self.args.dataset_file.strip('/').split('/')
-        if parts[-1].startswith('sim_'):
-            dataset_type = '_'.join(parts[-3:])
-        else:
-            dataset_type = '_'.join(parts[-2:])
-
+        dataset_type = self.args.dataset_name.split('/')[-1]
         if self.args.encoder_type == 'plm':
-            file_name = os.path.join(self.file_header, self.args.plm_dir.split('/')[-1] + '_' + dataset_type + '.csv')
+            file_name = os.path.join(self.file_header, self.args.model_name_or_path.split('/')[-1] + '_' + dataset_type + '.csv')
         else:
             file_name = os.path.join(self.file_header,  dataset_type + '.csv')
 
-
+        csv_file_dir = os.path.dirname(file_name)
+        os.makedirs(csv_file_dir, exist_ok=True)
+        
         with open(file_name, mode='w', newline='') as file:
             writer = csv.writer(file)
 
@@ -345,6 +343,17 @@ class Trainer(nn.Module):
                 writer.writerow(row)
         print(f'>> Log saved to {file_name}')
 
+    def save_model(self):
+        if self.args.model_weight_path:
+            os.makedirs(self.args.model_weight_path, exist_ok=True)
+
+            if self.args.encoder_type == 'plm':
+                pt_name = self.args.model_name_or_path.split('/')[-1] + '_' + self.args.dataset_name.split('/')[-1]    
+            else:
+                pt_name = self.args.encoder_type + '_'  + self.args.dataset_name.split('/')[-1]
+
+            torch.save(self.best_state, os.path.join(self.args.model_weight_path, pt_name + '.pt'))
+            print(f'>> Model saved to {os.path.join(self.args.model_weight_path, pt_name + ".pt")}')
 def create_parser():
 
     parser = argparse.ArgumentParser()
@@ -352,7 +361,7 @@ def create_parser():
     parser.add_argument('--task', type=str, choices=['token_cls', 'fragment_cls'], default='token_cls')
     parser.add_argument('--dataset_type', type=str, choices=['domain', 'motif', 'active_site', 'binding_site', 'conserved_site'])
     parser.add_argument('--pdb_file', type=str)
-    parser.add_argument('--dataset_file', type=str)
+    parser.add_argument('--dataset_name', type=str)
     parser.add_argument('--label_skew', action="store_true", default=False)
     # train
     parser.add_argument('--batch_size', type=int, default=4)
@@ -370,7 +379,7 @@ def create_parser():
     parser.add_argument('--encoder_type', type=str, choices=['plm', 'gvp', 'protssn'], default='plm')
     # plm
     parser.add_argument('--plm_type', type=str, choices=['esm', 'bert', 'ankh', 'saprot', 'prosst'])
-    parser.add_argument('--plm_dir', type=str)
+    parser.add_argument('--model_name_or_path', type=str)
     parser.add_argument('--plm_freeze', action="store_true", default=True)
     parser.add_argument('--max_len', type=int)
     parser.add_argument('--foldseek', type=str)
@@ -385,6 +394,8 @@ def create_parser():
     parser.add_argument('--num_labels', type=int, default=1)
     # csv_log
     parser.add_argument('--csv_log_path', type=str)
+    # model weight save
+    parser.add_argument('--model_weight_path', type=str)
 
     return parser.parse_args()
 

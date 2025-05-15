@@ -107,13 +107,13 @@ class TokenClsCollateFnForPLM:
         self.device = args.device
 
         if args.plm_type == 'bert':
-            self.tokenizer = BertTokenizer.from_pretrained(args.plm_dir)
+            self.tokenizer = BertTokenizer.from_pretrained(args.model_name_or_path)
         elif args.plm_type in ['esm', 'ankh']:
-            self.tokenizer = AutoTokenizer.from_pretrained(args.plm_dir)
+            self.tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
         elif args.plm_type == 'saprot':
-            self.tokenizer = EsmTokenizer.from_pretrained(args.plm_dir)
+            self.tokenizer = EsmTokenizer.from_pretrained(args.model_name_or_path)
         elif args.plm_type == 't5':
-            self.tokenizer = T5Tokenizer.from_pretrained(args.plm_dir, do_lower_case=False)
+            self.tokenizer = T5Tokenizer.from_pretrained(args.model_name_or_path, do_lower_case=False)
         else:
             raise ValueError(f"Unsupported PLM type: {args.plm_type}")
 
@@ -160,13 +160,13 @@ class FragmentClsCollateFnForPLM:
         self.device = args.device
 
         if args.plm_type == 'bert':
-            self.tokenizer = BertTokenizer.from_pretrained(args.plm_dir)
+            self.tokenizer = BertTokenizer.from_pretrained(args.model_name_or_path)
         elif args.plm_type in ['esm', 'ankh']:
-            self.tokenizer = AutoTokenizer.from_pretrained(args.plm_dir)
+            self.tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
         elif args.plm_type == 'saprot':
-            self.tokenizer = EsmTokenizer.from_pretrained(args.plm_dir)
+            self.tokenizer = EsmTokenizer.from_pretrained(args.model_name_or_path)
         elif args.plm_type == 't5':
-            self.tokenizer = T5Tokenizer.from_pretrained(args.plm_dir, do_lower_case=False)
+            self.tokenizer = T5Tokenizer.from_pretrained(args.model_name_or_path, do_lower_case=False)
         else:
             raise ValueError(f"Unsupported PLM type: {args.plm_type}")
 

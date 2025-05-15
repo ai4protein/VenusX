@@ -13,11 +13,11 @@ class PLMEncoder(nn.Module):
         super().__init__()
 
         if args.plm_type == 'bert':
-            self.plm = BertModel.from_pretrained(args.plm_dir)
+            self.plm = BertModel.from_pretrained(args.model_name_or_path)
         elif args.plm_type in ['esm', 'saprot']:
-            self.plm = EsmModel.from_pretrained(args.plm_dir)
+            self.plm = EsmModel.from_pretrained(args.model_name_or_path)
         elif args.plm_type in ['ankh', 't5']:
-            self.plm = T5EncoderModel.from_pretrained(args.plm_dir)
+            self.plm = T5EncoderModel.from_pretrained(args.model_name_or_path)
         else:
             raise ValueError("Invalid PLM type.")
 

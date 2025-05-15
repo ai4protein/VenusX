@@ -4,8 +4,8 @@ import torch.nn as nn
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import ast
-import csv
 from tqdm import tqdm
+from datasets import load_dataset
 
 from transformers import (
     BertTokenizer,
@@ -52,112 +52,72 @@ def load_data(args, mode='train'):
         os.remove(tmp_save_path + ".dbtype")
         return seq_dict
 
-    def load_seq_label_from_csv(file_path):
+    def load_data_from_huggingface(dataset_name, split):
+        dataset = load_dataset(dataset_name, split=split)
         
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f'File {file_path} not found.')
-        
-        data = []
-        
-        with open(file_path, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
+        if args.task == 'fragment_cls':
+            data = []
+            for item in dataset:
                 data.append({
-                    'name': row['pdb_id'] if args.dataset_type in ['biolip', 'sabdab'] else row['uid'],
-                    'sequence': row['seq_full'],
-                    'label': ast.literal_eval(row['label'])
+                    'name': item['uid'],
+                    'interpro': item['interpro_id'],
+                    'fragment': item['seq_fragment'],
+                    'interpro_label': item['interpro_label']
                 })
-        return data
-
-    def load_fragment_label_from_csv(file_path):
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f'File {file_path} not found.')
-
-        data = []
-
-        with open(file_path, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                fragments = row['seq_fragment'].split('|')
-                starts = row['start'].split('|')
-                ends = row['end'].split('|')
-                for fragment, start, end in zip(fragments, starts, ends):
+            return data
+            
+        elif args.task == 'token_cls':
+            if args.encoder_type == 'plm':
+                if args.plm_type == 'saprot':
+                    valid_proteins = []
+                    pdb_path = args.pdb_file + args.dataset_type + '/raw/'
+                    
+                    for item in tqdm(dataset):
+                        combined_seq = load_struc_seq(
+                            args.foldseek,
+                            pdb_path + item["interpro_id"] + '/alphafold2_pdb/' + item["uid"] + '.pdb',
+                            chains=['A'],
+                            process_id=args.fs_process_id
+                        )["A"][2]
+                        
+                        if len(combined_seq) // 2 == len(ast.literal_eval(item["label"])):
+                            valid_proteins.append({
+                                'name': item['uid'],
+                                'interpro': item['interpro_id'],
+                                'sequence': combined_seq,
+                                'label': ast.literal_eval(item['label'])
+                            })
+                    
+                    print(f"Loaded {len(valid_proteins)} valid proteins")
+                    return valid_proteins
+                
+                else:
+                    data = []
+                    for item in dataset:
+                        data.append({
+                            'name': item['pdb_id'] if args.dataset_type in ['biolip', 'sabdab'] else item['uid'],
+                            'sequence': item['seq_full'],
+                            'label': ast.literal_eval(item['label'])
+                        })
+                    return data
+            
+            elif args.encoder_type in ['protssn', 'gvp']:
+                data = []
+                for item in dataset:
                     data.append({
-                        'name': row['uid'],
-                        'interpro': row['interpro_id'],
-                        'fragment': fragment,
-                        'start': str(start),
-                        'end': str(end),
-                        'interpro_label': int(row['interpro_label'])
+                        'name': item['uid'],
+                        'interpro': item['interpro_id'],
+                        'label': ast.literal_eval(item['label'])
                     })
+                return data
 
-        return data
-
-    def load_pdb_label_from_csv(file_path):
-
-        if not os.path.exists(file_path):
-            raise FileNotFoundError(f'File {file_path} not found.')
-        
-        data = []
-
-        with open(file_path, mode='r', encoding='utf-8') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                data.append({
-                    'name': row['uid'],
-                    'interpro': row['interpro_id'],
-                    'label': ast.literal_eval(row['label'])
-                })
-
-        return data
-
-    if args.task == 'fragment_cls':
-        protein_data = load_fragment_label_from_csv(args.dataset_file + mode + '.csv')
-        
-        if args.encoder_type == 'plm':
-            
-            if args.plm_type == 'saprot':
-                pdb_path = args.pdb_file + args.dataset_type + '/raw/'
-                for index, protein in tqdm(enumerate(protein_data)):
-                    protein_name = protein["interpro"] + '_' + protein["name"] + '_' + protein["start"] + '_' + protein["end"]
-                    combined_seq = load_struc_seq(
-                        args.foldseek,
-                        pdb_path + protein["interpro"] + '/alphafold2_pdb_fragment/' + protein_name + '.pdb',
-                        chains=['A'],
-                        process_id=args.fs_process_id
-                    )["A"][2]
-                    
-                    protein["fragment"] = combined_seq
-
-        return protein_data
-
-    elif args.task == 'token_cls':
-
-        if args.encoder_type == 'plm':
-            
-            if args.plm_type == 'saprot':
-                protein_data = load_pdb_label_from_csv(args.dataset_file + mode + '.csv')
-                valid_proteins = []
-                pdb_path = args.pdb_file + args.dataset_type + '/raw/'
-                for index, protein in tqdm(enumerate(protein_data)):
-                    combined_seq = load_struc_seq(
-                        args.foldseek,
-                        pdb_path + protein["interpro"] + '/alphafold2_pdb/' + protein["name"] + '.pdb',
-                        chains=['A'],
-                        process_id=args.fs_process_id
-                    )["A"][2]
-                    
-                    if len(combined_seq) // 2 == len(protein["label"]):
-                        protein["sequence"] = combined_seq
-                        valid_proteins.append(protein)
-
-                print(f"Loaded {len(valid_proteins)} valid proteins")
-                return valid_proteins
-            
-            else: return load_seq_label_from_csv(args.dataset_file + mode + '.csv')
-
-        elif args.encoder_type in ['protssn', 'gvp']:
-            return load_pdb_label_from_csv(args.dataset_file + mode + '.csv')
+    split_mapping = {
+        'train': 'train',
+        'valid': 'validation',
+        'test': 'test'
+    }
+    
+    return load_data_from_huggingface(args.dataset_name, split_mapping[mode])
 
 class VenusDataset(Dataset):
     
