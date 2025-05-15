@@ -176,9 +176,12 @@ tmp/
 log/
 result/
 
+src/test*
+data/*.ipynb
 data/interpro_2503/**
+script/baseline
 .cath_benchmark.ipynb
-
+blast_result_tmp.txt
 !data/
 !data/interpro_2503/
 !data/interpro_2503/active_site/
