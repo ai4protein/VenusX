@@ -16,7 +16,8 @@ VenusX benchmarks fine-grained protein understanding across multiple subprotein 
 
 Benchmarking protein models on VenusX reveals performance gaps between global and fine-grained tasks, highlighting the need for more robust and interpretable models.
 ### Baselines
-**Table: Summary of baseline models (methods) by input modality**
+<details>
+<summary>Table: Summary of baseline models (methods) by input modality</summary>
 
 **Task** indicates evaluation scope:  
 - "All" for all three tasks  
@@ -45,7 +46,7 @@ Benchmarking protein models on VenusX reveals performance gaps between global an
 |                        | Foldseek       | 3Di            | Pair  | --       | --               | --          | [Conda: Foldseek](https://anaconda.org/bioconda/foldseek) |
 |                        | TM-align       | mean           | Pair  | --       | --               | --          | [Conda: TM-align](https://anaconda.org/bioconda/tmalign) |
 
-
+</details>
 
 ## 🛫 Requirement
 ### Conda Environment
