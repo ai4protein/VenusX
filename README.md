@@ -76,7 +76,8 @@ All data processing, baseline experiments were conducted on 16 NVIDIA RTX 4090 G
 
 ### Dataset Information
 
-The dataset for the VenuX Benchmark can be viewed and downloaded at **[Huggingface:AI4Protein](https://huggingface.co/AI4Protein)**. For example: **[AI4Protein/VenusX_Res_Act_MF50](https://huggingface.co/datasets/AI4Protein/VenusX_Res_Act_MF50)** refers to an active site dataset used for identifying functionally important residues. The dataset is clustered based on 50% fragment similarity and divided into training, validation and test sets according to mixed families.
+The dataset for the VenuX Benchmark can be viewed and downloaded at **[Huggingface:AI4Protein:Venux_Dataset](https://huggingface.co/collections/AI4Protein/venusx-dataset-6825519dbac4963f77db79ba)**. 
+For example: **[AI4Protein/VenusX_Res_Act_MF50](https://huggingface.co/datasets/AI4Protein/VenusX_Res_Act_MF50)** refers to an active site dataset used for identifying functionally important residues. The dataset is clustered based on 50% fragment similarity and divided into training, validation and test sets according to mixed families.
 
 <img src="img/dataset_res.png" alt="Logo">
 
@@ -84,13 +85,13 @@ The dataset for the VenuX Benchmark can be viewed and downloaded at **[Huggingfa
 
 ### Train
 
-(1) The `VenusX/script/example/train/train_token_cls.sh` script demonstrates how to train a deep learning model for identifying functionally important residues.
+(1) The [`VenusX/script/example/train/train_token_cls.sh`](https://github.com/AI4Protein/VenusX/blob/main/script/example/train/train_token_cls.sh) script demonstrates how to train a deep learning model for identifying functionally important residues.
 
-(2) The `VenusX/script/example/train/frag_token_cls.sh` script demonstrates how to train a deep learning model for classifying fragments according to biological roles.
+(2) The [`VenusX/script/example/train/frag_token_cls.sh`](https://github.com/AI4Protein/VenusX/blob/main/script/example/train/frag_token_cls.sh) script demonstrates how to train a deep learning model for classifying fragments according to biological roles.
 
 ### Compute protein (fragment) embeddings
 
-Folder `VenusX/script/example/embedding` contains scripts for obtaining protein or fragment embeddings using deep learning models and traditional methods. Note: Please set the path of the dataset in the script according to the actual situation.
+Folder [`VenusX/script/example/embedding`](https://github.com/AI4Protein/VenusX/blob/main/script/example/embedding) contains scripts for obtaining protein or fragment embeddings using deep learning models and traditional methods. Note: Please set the path of the dataset in the script according to the actual situation.
 
 
 ## 🙌 Citation
