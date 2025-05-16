@@ -99,7 +99,7 @@ For example: **[AI4Protein/VenusX_Res_Act_MF50](https://huggingface.co/datasets/
 
 (1) The [`VenusX/script/example/train/train_token_cls.sh`](https://github.com/AI4Protein/VenusX/blob/main/script/example/train/train_token_cls.sh) script demonstrates how to train a deep learning model for identifying functionally important residues.
 
-(2) The [`VenusX/script/example/train/frag_token_cls.sh`](https://github.com/AI4Protein/VenusX/blob/main/script/example/train/frag_token_cls.sh) script demonstrates how to train a deep learning model for classifying fragments according to biological roles.
+(2) The [`VenusX/script/example/train/train_fragment_cls.sh`](https://github.com/AI4Protein/VenusX/blob/main/script/example/train/train_fragment_cls.sh) script demonstrates how to train a deep learning model for classifying fragments according to biological roles.
 
 ### Compute protein (fragment) embeddings
 
