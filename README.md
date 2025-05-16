@@ -1,8 +1,20 @@
-# VENUSX: Unlocking Fine-Grained Functional Understanding of Proteins
+# VenusX: Unlocking Fine-Grained Functional Understanding of Proteins
 
 ## 🚀 Introduction
 
-**VenusX** is a large-scale benchmark for fine-grained protein functional annotation and pairing at residue, fragment, and domain levels. It includes three task categories with six annotation types: residue-level binary classification, fragment-level multi-class classification, and unsupervised local structure pairing for **active sites**, **binding sites**, **conserved sites**, **motifs**, **domains**, and **epitopes**. The benchmark contains over **878,000** samples from InterPro, BioLiP, and SAbDab databases, with mixed-family and cross-family splits at 50%, 70%, and 90% sequence identity thresholds.
+**VenusX** is a large-scale benchmark for fine-grained protein functional annotation and pairing at residue, fragment, and domain levels.
+
+Key features:
+- Three task categories with six annotation types:
+  - Residue-level binary classification
+  - Fragment-level multi-class classification 
+  - Unsupervised local structure pairing
+
+- Six functional annotation types: **Active sites**, **Binding sites**, **Conserved sites**, **Motifs**, **Domains**, **Epitopes**
+
+- Dataset characteristics:
+  - Over **878,000** samples from InterPro, BioLiP, and SAbDab databases
+  - Mixed-family and cross-family splits at 50%, 70%, and 90% sequence identity thresholds
 <img src="img/framework.png" alt="Logo">
 
 ## 📑 Results
