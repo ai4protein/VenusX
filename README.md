@@ -10,7 +10,7 @@
 
 ### News
 
-- 2026-02-25: **The newest implementation has been transfered to the VenusFactory repository.** [Github](https://github.com/AI4Protein/VenusFactory)
+- 2026-02-25: VenusX has been integrated into [VenusFactory2](https://github.com/ai4protein/VenusFactory2). Welcome to use it! Here is the [web server](https://venusfactory.cn/playground/) and [technical report](https://arxiv.org/abs/2603.27303).
 - 2026-01-26: VenusX is accepted by ICLR 2026. [Paper](https://openreview.net/forum?id=zcmL592XRG)
 
 ### Paper Results
